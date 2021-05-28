@@ -21,24 +21,24 @@ public class Image implements Serializable{
 	private String fileName; 
 	
 	@JsonFormat(pattern = "dd-MM-yyyy HH:mm:ss")
-	private LocalDateTime date;
-	private byte[] data;
+	private LocalDateTime createDate;
 	
 	private String type;
+	private String rootPath;
+	private String path;
 	
 	
-	
-	public Image(String fileName2, String type2, byte[] data2) {
-	}
-	
-	public Image(Long id, String fileName, LocalDateTime date, byte[] data, String type) {
-		this.id = id;
-		this.fileName = fileName;
-		this.date = date;
-		this.data = data;
-		this.type = type;
+	public Image() {
 	}
 
+	public Image(Long id, String fileName, LocalDateTime createDate, String type, String rootPath, String path) {
+		this.id = id;
+		this.fileName = fileName;
+		this.createDate = createDate;
+		this.type = type;
+		this.rootPath = rootPath;
+		this.path = path;
+	}
 
 
 	public Long getId() {
@@ -57,12 +57,13 @@ public class Image implements Serializable{
 		this.fileName = fileName;
 	}
 
-	public LocalDateTime getDate() {
-		return date;
+
+	public LocalDateTime getCreateDate() {
+		return createDate;
 	}
 
-	public void setDate(LocalDateTime date) {
-		this.date = date;
+	public void setCreateDate(LocalDateTime createDate) {
+		this.createDate = createDate;
 	}
 
 	public String getType() {
@@ -72,46 +73,52 @@ public class Image implements Serializable{
 	public void setType(String type) {
 		this.type = type;
 	}
-	
-	public byte[] getData() {
-		return data;
-	}
 
-	public void setData(byte[] data) {
-		this.data = data;
-	}
 
 	@PrePersist
 	protected void onCreate() {
-		this.date = LocalDateTime.now();
+		this.createDate = LocalDateTime.now();
 	}
-	
-	public static class ImageBuilder{
-		private String fileName;
-		private String type;
-		private byte[] data;
-		
-		private ImageBuilder(byte[] data) {
-			this.data = data;
-		}
-		
-		public static ImageBuilder newBuilder(byte[] data) {
-			return new ImageBuilder(data);
-		}
-		
-		public ImageBuilder withFileName(String fileName) {
-			this.fileName = fileName;
-			return this;
-		}
-		
-		public ImageBuilder withType(String type) {
-			this.type = type;
-			return this;
-		}
-		
-		public Image build() {
-			return new Image(fileName, type, data);
-		}
+
+	public String getRootPath() {
+		return rootPath;
+	}
+
+	public void setRootPath(String rootPath) {
+		this.rootPath = rootPath;
+	}
+
+	public String getPath() {
+		return path;
+	}
+
+	public void setPath(String path) {
+		this.path = path;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((id == null) ? 0 : id.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Image other = (Image) obj;
+		if (id == null) {
+			if (other.id != null)
+				return false;
+		} else if (!id.equals(other.id))
+			return false;
+		return true;
 	}
 	
 }
