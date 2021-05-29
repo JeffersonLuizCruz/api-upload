@@ -19,6 +19,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.imagem.entities.Image;
 import com.imagem.services.impl.ImageServiceImpl;
+import com.imagem.services.pagemodel.PageModel;
+import com.imagem.services.pagemodel.PagePersonModel;
 
 @RestController
 @RequestMapping("/api/v1/image")
@@ -51,6 +53,18 @@ public class ImageController {
 				.contentType(MediaType.parseMediaType(doc.getType()))
 				.header(HttpHeaders.CONTENT_DISPOSITION,"attachment:filename=\""+doc.getFileName()+"\"")
 				.body(new ByteArrayResource(doc.getBytes()));
+	}
+	
+	@GetMapping
+	public ResponseEntity<PageModel<Image>> listAllByOnLazyModel(
+			@RequestParam(value = "page", defaultValue = "0") int page,
+			@RequestParam(value = "size", defaultValue = "10") int size){
+		
+		PagePersonModel pr = new PagePersonModel(page, size);
+		
+		PageModel<Image> pm = imageService.listAllByOnLazyModel(pr);
+		
+		return ResponseEntity.ok().body(pm);
 	}
 
 }
