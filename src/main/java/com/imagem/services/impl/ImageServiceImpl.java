@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -20,8 +21,9 @@ import com.imagem.repositories.ImageRepository;
 import com.imagem.services.ImageService;
 import com.imagem.services.exceptions.BadRequestException;
 import com.imagem.services.exceptions.NotFoundException;
+import com.imagem.services.pagemodel.PageImageModel;
 import com.imagem.services.pagemodel.PageModel;
-import com.imagem.services.pagemodel.PagePersonModel;
+import com.imagem.specification.ImageSpecification;
 
 @Service
 public class ImageServiceImpl implements ImageService{
@@ -68,13 +70,16 @@ public class ImageServiceImpl implements ImageService{
 	}
 	
 	@Override
-	public PageModel<Image> listAllByOnLazyModel(PagePersonModel pr){
+	public PageModel<Image> listAllByOnLazyModel(PageImageModel pr){
 		Pageable pageable = PageRequest.of(pr.getPage(), pr.getSize());
-		Page<Image> page = imageRepository.findAll(pageable);
+		Specification<Image> spec = ImageSpecification.search(pr.getSearch());
+		
+		Page<Image> page = imageRepository.findAll(spec, pageable);
 		
 		PageModel<Image> pm = new PageModel<>(
 				(int)page.getTotalElements(),
-				page.getSize(), page.getTotalPages(),
+				page.getSize(),
+				page.getTotalPages(),
 				page.getContent());
 		
 		return pm;

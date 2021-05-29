@@ -2,6 +2,7 @@ package com.imagem.controllers;
 
 
 import java.io.IOException;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
@@ -19,8 +20,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.imagem.entities.Image;
 import com.imagem.services.impl.ImageServiceImpl;
+import com.imagem.services.pagemodel.PageImageModel;
 import com.imagem.services.pagemodel.PageModel;
-import com.imagem.services.pagemodel.PagePersonModel;
 
 @RestController
 @RequestMapping("/api/v1/image")
@@ -55,16 +56,26 @@ public class ImageController {
 				.body(new ByteArrayResource(doc.getBytes()));
 	}
 	
+//	@GetMapping
+//	public ResponseEntity<PageModel<Image>> listAllByOnLazyModel(
+//			@RequestParam(value = "page", defaultValue = "0") int page,
+//			@RequestParam(value = "size", defaultValue = "10") int size,
+//			@RequestParam(value = "search", defaultValue = "") String search)
+//	{
+//		
+//		PageImageModel pr = new PageImageModel(page, size, search);
+//		
+//		PageModel<Image> pm = imageService.listAllByOnLazyModel(pr);
+//		
+//		return ResponseEntity.ok().body(pm);
+//	}
+	
 	@GetMapping
-	public ResponseEntity<PageModel<Image>> listAllByOnLazyModel(
-			@RequestParam(value = "page", defaultValue = "0") int page,
-			@RequestParam(value = "size", defaultValue = "10") int size){
+	public ResponseEntity<PageModel<Image>> listAll(@RequestParam Map<String, String> params){
+			PageImageModel pr = new PageImageModel(params);
+			PageModel<Image> pm = imageService.listAllByOnLazyModel(pr);
 		
-		PagePersonModel pr = new PagePersonModel(page, size);
-		
-		PageModel<Image> pm = imageService.listAllByOnLazyModel(pr);
-		
-		return ResponseEntity.ok().body(pm);
+		return ResponseEntity.ok(pm);
 	}
 
 }
