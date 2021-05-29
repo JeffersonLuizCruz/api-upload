@@ -32,7 +32,6 @@ imagem
 - [x] CRUD (ORM Hibernate - Ambiente de teste)<br>
 - [x] Exception Personalizada
 - [x] Consulta e Busca Paginada Inteligente
-- [x] Serviço de Email
 
 
 ## Start do Projeto Local
