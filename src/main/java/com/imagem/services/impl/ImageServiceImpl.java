@@ -70,7 +70,7 @@ public class ImageServiceImpl implements ImageService{
 	private Image uploadImageToDataBase(MultipartFile image) throws IOException {
 		String type = image.getContentType();
 		String fileName = image.getOriginalFilename();
-		byte[] bytes = image.getBytes(); ; 
+		byte[] bytes = image.getBytes();
 		
 		validateExtension(fileName);
 		
