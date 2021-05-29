@@ -31,16 +31,16 @@ public class ImageServiceImpl implements ImageService{
 	@Autowired private ImageRepository imageRepository;
 	
 	
-	
+	//Diretório raiz.
 	@Value("${contato.disco.raiz}")
 	private String rootPath;
-	
+	//Diretório onde a imagem será salva.
 	@Value("${contato.disco.diretorio-fotos}")
 	private String photoDirectory;
 	
 	
 	
-
+	//Salva imagem no banco de dados Postgres.
 	@Override
 	public Image save(MultipartFile image) {
 		try {
@@ -50,7 +50,7 @@ public class ImageServiceImpl implements ImageService{
 		}
 		return null;
 	}
-	
+	//Salva imagem no diretório.
 	public void savePhotoToDirectory(String directory, MultipartFile file) throws IOException {	
 		Path directoryPath = Paths.get(this.rootPath, directory);
 		Path filePath = directoryPath.resolve(file.getOriginalFilename());
@@ -63,12 +63,14 @@ public class ImageServiceImpl implements ImageService{
 		}		
 	}
 	
+	//Busca imagem por id .
 	@Override
 	public Image findById(Long id) {
 		
 		return verifyIfExist(id);
 	}
 	
+	//Consulta paginada e consulta por extensão de arquivo e nome.
 	@Override
 	public PageModel<Image> listAllByOnLazyModel(PageImageModel pr){
 		Pageable pageable = PageRequest.of(pr.getPage(), pr.getSize());
@@ -105,7 +107,7 @@ public class ImageServiceImpl implements ImageService{
 		
 		return imageRepository.saveAndFlush(images);
 	}
-	
+	//Validação por extensão de arquivo.
 	private void validateExtension(String fileName) {
 		if(!fileName.endsWith(".jpg") && !fileName.endsWith(".png") && !fileName.endsWith(".pdf") && !fileName.endsWith("tiff"))
 			throw new BadRequestException("Extensão de imagem inválida!["+ fileName + "] - Extensão de arquivo válido: jpeg, png, tiff e pdf");

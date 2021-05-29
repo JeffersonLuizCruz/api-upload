@@ -28,7 +28,7 @@ import com.imagem.services.pagemodel.PageModel;
 public class ImageController {
 	
 	@Autowired private ImageServiceImpl imageService;
-	
+	//Diretório onde a imagem será salva
 	private static  String PATH = "fotos";
 	
 	
@@ -55,20 +55,6 @@ public class ImageController {
 				.header(HttpHeaders.CONTENT_DISPOSITION,"attachment:filename=\""+doc.getFileName()+"\"")
 				.body(new ByteArrayResource(doc.getBytes()));
 	}
-	
-//	@GetMapping
-//	public ResponseEntity<PageModel<Image>> listAllByOnLazyModel(
-//			@RequestParam(value = "page", defaultValue = "0") int page,
-//			@RequestParam(value = "size", defaultValue = "10") int size,
-//			@RequestParam(value = "search", defaultValue = "") String search)
-//	{
-//		
-//		PageImageModel pr = new PageImageModel(page, size, search);
-//		
-//		PageModel<Image> pm = imageService.listAllByOnLazyModel(pr);
-//		
-//		return ResponseEntity.ok().body(pm);
-//	}
 	
 	@GetMapping
 	public ResponseEntity<PageModel<Image>> listAll(@RequestParam Map<String, String> params){
