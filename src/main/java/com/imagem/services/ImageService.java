@@ -7,5 +7,6 @@ import com.imagem.entities.Image;
 public interface ImageService {
 	
 	Image save(MultipartFile image);
+	Image findById(Long id);
 
 }

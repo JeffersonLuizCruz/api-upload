@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -15,63 +16,86 @@ import com.imagem.entities.Image;
 import com.imagem.repositories.ImageRepository;
 import com.imagem.services.ImageService;
 import com.imagem.services.exceptions.BadRequestException;
+import com.imagem.services.exceptions.NotFoundException;
 
 @Service
 public class ImageServiceImpl implements ImageService{
 	
 	@Autowired private ImageRepository imageRepository;
 	
+	
+	
+	
 	@Value("${contato.disco.raiz}")
-	private String pathRoot ="/tmp/contato-disco";
+	private String rootPath;
 	
 	@Value("${contato.disco.diretorio-fotos}")
-	private String pathPhoto = "fotos";
+	private String photoDirectory;
+	
+	
+	
 
 	@Override
 	public Image save(MultipartFile image) {
 		
 		try {
-			return uploadImage(image);
+			return uploadImageToDataBase(image);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		this.salvar(this.pathPhoto, image);
+		
 		return null;
 	}
-
-	private Image uploadImage(MultipartFile image) throws IOException {
-		String type = image.getContentType();
-		String fileName = image.getOriginalFilename();
+	
+	public void savePhotoToDirectory(String directory, MultipartFile file) throws IOException {	
+		Path directoryPath = Paths.get(this.rootPath, directory);
+		Path filePath = directoryPath.resolve(file.getOriginalFilename());
 		
-		validateImageName(fileName);
-		
-		Image images = new Image();
-		images.setType(type);
-		images.setFileName(fileName);
-		images.setRootPath(pathRoot);
-		images.setPath(pathPhoto);
-		
-		return imageRepository.save(images);
+		try {
+			Files.createDirectories(directoryPath);
+			file.transferTo(filePath.toFile());			
+		} catch (IOException e) {
+			throw new RuntimeException("Problemas na tentativa de salvar arquivo.", e);
+		}		
 	}
 	
-	private void validateImageName(String fileName) {
+	@Override
+	public Image findById(Long id) {
+		
+		return verifyIfExist(id);
+	}
+	
+	
+
+	private Image uploadImageToDataBase(MultipartFile image) throws IOException {
+		String type = image.getContentType();
+		String fileName = image.getOriginalFilename();
+		byte[] bytes = image.getBytes(); ; 
+		
+		validateExtension(fileName);
+		
+		Image images = new Image();
+		
+		images.setBytes(bytes);
+		images.setType(type);
+		images.setFileName(fileName);
+		images.setRootPath(rootPath);
+		images.setPath(photoDirectory);
+		
+		
+		return imageRepository.saveAndFlush(images);
+	}
+	
+	private void validateExtension(String fileName) {
 		if(!fileName.endsWith(".jpg") && !fileName.endsWith(".png") && !fileName.endsWith(".pdf") && !fileName.endsWith("tiff"))
 			throw new BadRequestException("Extensão de imagem inválida!["+ fileName + "] - Extensão de arquivo válido: jpeg, png, tiff e pdf");
 	}
 	
-	private void salvar(String diretorio, MultipartFile arquivo) {
-		String fileName = arquivo.getOriginalFilename();
-		validateImageName(fileName);
+	private Image verifyIfExist(Long id) {
+		Optional<Image> result = imageRepository.findById(id);
+		result.orElseThrow(() -> new NotFoundException("Imagem com id ["+ id +"] não encontradada na Base de Dado"));
 		
-		Path diretorioPath = Paths.get(this.pathPhoto, diretorio);
-		Path arquivoPath = diretorioPath.resolve(arquivo.getOriginalFilename());
-		
-		try {
-			Files.createDirectories(diretorioPath);
-			arquivo.transferTo(arquivoPath.toFile());			
-		} catch (IOException e) {
-			throw new RuntimeException("Problemas na tentativa de salvar arquivo.", e);
-		}		
+		return result.get();
 	}
 
 }

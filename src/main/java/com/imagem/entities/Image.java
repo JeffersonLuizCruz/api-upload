@@ -1,12 +1,13 @@
 package com.imagem.entities;
 
 import java.io.Serializable;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Lob;
 import javax.persistence.PrePersist;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -18,28 +19,34 @@ public class Image implements Serializable{
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-	private String fileName; 
 	
-	@JsonFormat(pattern = "dd-MM-yyyy HH:mm:ss")
-	private LocalDateTime createDate;
+	
+	
+	private String fileName; 	
+	@JsonFormat(pattern = "dd-MM-yyyy")
+	private LocalDate createDate;
 	
 	private String type;
 	private String rootPath;
 	private String path;
 	
+	@Lob
+	private byte[] bytes;
+	
 	
 	public Image() {
 	}
 
-	public Image(Long id, String fileName, LocalDateTime createDate, String type, String rootPath, String path) {
+	public Image(Long id, String fileName, LocalDate createDate, String type, String rootPath, String path,
+			byte[] bytes) {
 		this.id = id;
 		this.fileName = fileName;
 		this.createDate = createDate;
 		this.type = type;
 		this.rootPath = rootPath;
 		this.path = path;
+		this.bytes = bytes;
 	}
-
 
 	public Long getId() {
 		return id;
@@ -56,13 +63,13 @@ public class Image implements Serializable{
 	public void setFileName(String fileName) {
 		this.fileName = fileName;
 	}
+	
 
-
-	public LocalDateTime getCreateDate() {
+	public LocalDate getCreateDate() {
 		return createDate;
 	}
 
-	public void setCreateDate(LocalDateTime createDate) {
+	public void setCreateDate(LocalDate createDate) {
 		this.createDate = createDate;
 	}
 
@@ -77,7 +84,7 @@ public class Image implements Serializable{
 
 	@PrePersist
 	protected void onCreate() {
-		this.createDate = LocalDateTime.now();
+		this.createDate = LocalDate.now();
 	}
 
 	public String getRootPath() {
@@ -94,6 +101,14 @@ public class Image implements Serializable{
 
 	public void setPath(String path) {
 		this.path = path;
+	}
+
+	public byte[] getBytes() {
+		return bytes;
+	}
+
+	public void setBytes(byte[] bytes) {
+		this.bytes = bytes;
 	}
 
 	@Override
