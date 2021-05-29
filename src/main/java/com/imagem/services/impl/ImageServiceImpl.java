@@ -9,6 +9,9 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -17,12 +20,13 @@ import com.imagem.repositories.ImageRepository;
 import com.imagem.services.ImageService;
 import com.imagem.services.exceptions.BadRequestException;
 import com.imagem.services.exceptions.NotFoundException;
+import com.imagem.services.pagemodel.PageModel;
+import com.imagem.services.pagemodel.PagePersonModel;
 
 @Service
 public class ImageServiceImpl implements ImageService{
 	
 	@Autowired private ImageRepository imageRepository;
-	
 	
 	
 	
@@ -37,13 +41,11 @@ public class ImageServiceImpl implements ImageService{
 
 	@Override
 	public Image save(MultipartFile image) {
-		
 		try {
 			return uploadImageToDataBase(image);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
 		return null;
 	}
 	
@@ -63,6 +65,19 @@ public class ImageServiceImpl implements ImageService{
 	public Image findById(Long id) {
 		
 		return verifyIfExist(id);
+	}
+	
+	@Override
+	public PageModel<Image> listAllByOnLazyModel(PagePersonModel pr){
+		Pageable pageable = PageRequest.of(pr.getPage(), pr.getSize());
+		Page<Image> page = imageRepository.findAll(pageable);
+		
+		PageModel<Image> pm = new PageModel<>(
+				(int)page.getTotalElements(),
+				page.getSize(), page.getTotalPages(),
+				page.getContent());
+		
+		return pm;
 	}
 	
 	
@@ -97,5 +112,6 @@ public class ImageServiceImpl implements ImageService{
 		
 		return result.get();
 	}
+
 
 }
