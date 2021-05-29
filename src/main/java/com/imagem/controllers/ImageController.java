@@ -42,13 +42,13 @@ public class ImageController {
 	
 	@GetMapping("/{id}")
 	@ResponseBody
-	public Image findType(@PathVariable Long id){
+	public Image findById(@PathVariable Long id){
 		
 		return imageService.findById(id);
 	}
 	
 	@GetMapping("/download/{id}")
-	public ResponseEntity<ByteArrayResource> downloadFile(@PathVariable Long id){
+	public ResponseEntity<ByteArrayResource> download(@PathVariable Long id){
 		Image doc = imageService.findById(id);
 		return ResponseEntity.ok()
 				.contentType(MediaType.parseMediaType(doc.getType()))
